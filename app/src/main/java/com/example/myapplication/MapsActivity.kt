@@ -32,6 +32,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapsBinding
 
 
+    //Nick test comment
+
 
     //Location service objects
     private var locationPermissionEnabled:Boolean = false
