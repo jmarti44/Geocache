@@ -33,6 +33,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
     //Nick test comment
+    //David test comment
 
 
     //Location service objects
