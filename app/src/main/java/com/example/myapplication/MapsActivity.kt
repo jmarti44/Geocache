@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.example.myapplication.Util.*
 import com.example.myapplication.databinding.ActivityMapsBinding
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -21,6 +22,7 @@ import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlin.random.Random
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -29,6 +31,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     //google map objects
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+
+    //Objects for bottom menu
+    private lateinit var bottomNav: BottomNavigationView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +48,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this@MapsActivity)
 
+        //Testing for menu
+        val settingsFragment = SettingsFragment()
+        val historyFragment = HistoryFragment()
+        //val test = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        setFragmentMenu(settingsFragment)
+        bottomNav = findViewById(R.id.bottomNav)
+        bottomNav.setOnNavigationItemSelectedListener {
+            when(it.itemId){
+                //R.id.map->setFragmentMenu(test)
+                R.id.settings->setFragmentMenu(settingsFragment)
+                R.id.history->setFragmentMenu(historyFragment)
+            }
+            true
+        }
     }
+
+    //Test function for menu
+    private fun setFragmentMenu(fragment: Fragment)=
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.testFragment,fragment)
+            commit()
+        }
 
     override fun onMapReady(googleMap: GoogleMap) {
 
