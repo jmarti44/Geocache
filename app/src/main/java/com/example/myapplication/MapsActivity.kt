@@ -3,6 +3,7 @@ package com.example.myapplication
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
@@ -13,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.myapplication.Model.GeoCacheDataSource
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import com.example.myapplication.Util.*
 import com.example.myapplication.databinding.ActivityMapsBinding
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -21,6 +24,7 @@ import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,6 +40,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
     lateinit var geoCacheSource : GeoCacheDataSource
+
+    //Objects for bottom menu
+    private lateinit var bottomNav: BottomNavigationView
 
 
     private var currentLongitude : Double = 0.0
@@ -84,7 +91,69 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this@MapsActivity)
 
+        //Creates fragment's to reference on bottom menu bar
+        val settingsFragment = SettingsFragment()
+        val historyFragment = HistoryFragment()
+        val nearbyFragment = NearbyFragment()
+
+        //Sets a default fragment
+        setFragmentMenu(settingsFragment)
+
+        //Finds bottom nav value
+        bottomNav = findViewById(R.id.bottomNav)
+
+        //For each button
+        bottomNav.setOnNavigationItemSelectedListener {
+            when(it.itemId){
+                //Sets and changes to map activity
+                R.id.map-> {
+                    val mapIntent = Intent(this, MapsActivity::class.java)
+                    startActivity(mapIntent)
+                }
+
+                //Sets and changes to history fragment
+                R.id.history->{
+                    setFragmentMenu(historyFragment)
+                    if (savedInstanceState == null){
+                        val histFrag = HistoryFragment()
+                        val changeFrag: FragmentTransaction = supportFragmentManager.beginTransaction()
+                        changeFrag.replace(R.id.map, histFrag)
+                        changeFrag.commit()
+                    }
+                }
+
+                //Sets and changes to nearby fragment
+                R.id.nearby->{
+                    setFragmentMenu(nearbyFragment)
+                    if (savedInstanceState == null){
+                        val nearFrag = NearbyFragment()
+                        val changeFrag: FragmentTransaction = supportFragmentManager.beginTransaction()
+                        changeFrag.replace(R.id.map, nearFrag)
+                        changeFrag.commit()
+                    }
+                }
+
+                //Sets and changes to settings fragment
+                R.id.settings->{
+                    setFragmentMenu(settingsFragment)
+                    if (savedInstanceState == null){
+                        val setFrag = SettingsFragment()
+                        val changeFrag: FragmentTransaction = supportFragmentManager.beginTransaction()
+                        changeFrag.replace(R.id.map, setFrag)
+                        changeFrag.commit()
+                    }
+                }
+            }
+            true
+        }
     }
+
+    //Test function for menu
+    private fun setFragmentMenu(fragment: Fragment)=
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.testFragment,fragment)
+            commit()
+        }
 
 //    override fun onResume() {
 //
