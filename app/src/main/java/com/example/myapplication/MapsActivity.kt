@@ -12,55 +12,188 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.myapplication.Model.GeoCacheDataSource
 import com.example.myapplication.Util.*
 import com.example.myapplication.databinding.ActivityMapsBinding
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
-import kotlin.random.Random
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
-
 
     //google map objects
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
 
+    lateinit var geoCacheSource : GeoCacheDataSource
+
+
+    private var currentLongitude : Double = 0.0
+    private var currentLatitude: Double = 0.0
+
+
+    private  lateinit var geoCaches: List<String>
+    private lateinit var latlngObjects : MutableList<LatLng>
+
+
+
+
+    //consumer key
+
+
+
+//    Path: /v1/geocaches
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
 
+        super.onCreate(savedInstanceState)
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        geoCacheSource = GeoCacheDataSource(applicationContext)
 
 
-        val mapFragment = supportFragmentManager
+
+    val locationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        when {
+            permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+                // Precise location access granted.
+            }
+            permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+                // Only approximate location access granted.
+            } else -> {
+            // No location access granted.
+        }
+        }
+    }
+
+
+
+    val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this@MapsActivity)
 
     }
 
+//    override fun onResume() {
+//
+//        super.onResume()
+//        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+//        fusedLocationClient.lastLocation
+//            .addOnSuccessListener { location : Location? ->
+//                if (location != null) {
+//                    currentLatitude = location.latitude
+//                    currentLongitude = location.longitude
+//
+//                    CoroutineScope(Dispatchers.IO).launch {
+//                        val geoCaches : List<String> = geoCacheSource.getGeoCacheCodes(currentLongitude,currentLatitude)
+//                        withContext(Dispatchers.Main){
+//                            try{
+//                                toast("Got ${geoCaches.size} Geocaches!")
+//                            }catch (e: HttpException) {
+//                                toast("Exception ${e.message}")
+//                            } catch (e: Throwable) {
+//                                toast("Ooops: Something else went wrong")
+//                            }
+//                        }
+//                        populateObjects(geoCaches)
+//                    }
+//
+//                }
+//
+//                // Got last known location. In some rare situations this can be null.
+//            }
+//
+//    }
+
     override fun onMapReady(googleMap: GoogleMap) {
-
             mMap = googleMap
-            mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style));
-            mMap.setMinZoomPreference(15f)
+            mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style))
+//            mMap.setMinZoomPreference(15f)
             enableMyLocation()
-
+            drawMyLocation()
+            //getting currentLocation and getting geo cache codes
             if (mMap.isMyLocationEnabled){
-                drawMyLocation()
-            }
+                fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+                fusedLocationClient.lastLocation
+                    .addOnSuccessListener { location : Location? ->
+                        if (location != null) {
+                            currentLatitude = location.latitude
+                            currentLongitude = location.longitude
 
+                            CoroutineScope(Dispatchers.IO).launch {
+                                geoCaches = geoCacheSource.getGeoCacheCodes(currentLongitude,currentLatitude)
+                                withContext(Dispatchers.Main){
+                                    try{
+                                        toast("Got ${geoCaches.size} Geocaches!")
+                                    }catch (e: HttpException) {
+                                        toast("Exception ${e.message}")
+                                    } catch (e: Throwable) {
+                                        toast("Ooops: Something else went wrong")
+                                    }
+                                }
+                                val geoCacheLocations : MutableList<String?> = geoCacheSource.getGeoCaches(geoCaches)
+                                Log.d("geoCacheLocatios",geoCacheLocations.toString())
+
+//
+                                withContext(Dispatchers.Main){
+                                    try{
+                                        toast("Got ${geoCacheLocations.size} Geocache Points!")
+                                        var locationData: MutableList<List<String>> = arrayListOf()
+                                        for (location in geoCacheLocations){
+                                            val delimeter = "|"
+                                            if (location != null) {
+                                                var latitude = location.split(delimeter)[0].toDouble()
+                                                var longitude = location.split(delimeter)[1].toDouble()
+                                                val geoCacheMarker = LatLng(latitude, longitude)
+                                                val myLocation  = LatLng(currentLatitude,currentLongitude)
+                                                Log.d("Current location",myLocation.toString())
+                                                Log.d("Geocache Marker!!!!!",geoCacheMarker.toString())
+
+                                                mMap.addMarker(
+                                                    MarkerOptions()
+                                                        .position(geoCacheMarker)
+                                                        .title("Geo Cache Marker")
+                                                )
+                                            }
+                                        }
+                                    }catch (e: HttpException) {
+                                        toast("Exception ${e.message}")
+                                    } catch (e: Throwable) {
+                                        toast("Ooops: Something else went wrong")
+                                    }
+                                }
+
+
+                            }
+//                            if (geoCaches.size!=0){
+//                                Log.d("POPULATED OBJECTS BEING CALLED","!!!!!!!!")
+//                                populateObjects(geoCaches)
+//                                drawMyLocation()
+//                            }
+                        }
+                    // Got last known location. In some rare situations this can be null.
+                    }
+
+
+            }
     }
     fun drawMyLocation(){
-        mMap.isMyLocationEnabled
-    }
+        mMap.isMyLocationEnabled = true
 
+
+    }
     @SuppressLint("MissingPermission")
     private fun enableMyLocation(){
 
@@ -102,12 +235,41 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             LOCATION_PERMISSION_REQUEST_CODE
         )
     }
+    fun populateObjects(geoCaches: List<String>) {
+        var locationData: MutableList<List<String>> = arrayListOf()
+
+        //getting locations of geocaches based on retreived geocachecodes
+        CoroutineScope(Dispatchers.IO).launch {
+            val geoCacheLocations : MutableList<String?> = geoCacheSource.getGeoCaches(geoCaches)
+            //cleaning location data (lat|long)
+            for (location in geoCacheLocations){
+                var delimeter = "|"
+                if (location != null) {
+                    locationData.add(location.split(delimeter))
+                }
+            }
+
+        }
+        if (locationData.size!=0){
+            Log.d("POPULATED LOCATION DATA BEING CALLED","!!!!!!!!")
+
+            for (latlng in locationData){
+                val latitude :Double? = latlng.get(0).toDouble()
+                val longitude :Double? = latlng.get(1).toDouble()
 
 
-    fun populateObjects(googleMap: GoogleMap){
-        mMap = googleMap
-        Log.d("POPULATE OBJECTS BEING CALLED","!!!!!!!!!!!")
+//                val geoCacheMarker = LatLng(latitude!!, longitude!!)
+                Log.d("RETURNED GEOCACHE Latitude",latitude.toString())
+                Log.d("RETURNED GEOCACHE LONGITUDE",longitude.toString())
 
+                val geoCacheMarker = LatLng(latitude!!, longitude!!)
+                latlngObjects.add(geoCacheMarker)
+            }
+        }
+
+//        for (code in geoCaches){
+//            val geoCaches : List<String> = geoCacheSource.getGeoCaches(code)
+//        }
     }
     companion object {
         /**
@@ -116,5 +278,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
          * @see .onRequestPermissionsResult
          */
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
+    }
+
+
+    private fun toast(text:String){
+        Toast.makeText(this,text, Toast.LENGTH_LONG).show()
     }
 }

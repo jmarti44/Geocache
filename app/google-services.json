@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "8950476841",
+    "project_id": "geocache-368521",
+    "storage_bucket": "geocache-368521.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:8950476841:android:ba417f112483d997c4ec38",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "8950476841-3vga35797c6q2ibldqj5ipk6m1ktv0b5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApKNBMFxjubiAV1KBEYv9S4NkHvN3yqr8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "8950476841-3vga35797c6q2ibldqj5ipk6m1ktv0b5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
