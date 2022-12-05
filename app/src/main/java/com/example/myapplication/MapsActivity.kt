@@ -16,6 +16,8 @@ import androidx.core.content.ContextCompat
 import com.example.myapplication.Model.GeoCacheDataSource
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.Util.*
 import com.example.myapplication.databinding.ActivityMapsBinding
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -68,6 +70,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         geoCacheSource = GeoCacheDataSource(applicationContext)
 
+//        val recyclerview = findViewById<RecyclerView>(R.id.recyclerview)
+//
+//
+//        Log.d("NEARBY FRAGEMENT ON CREATE","!!!!!!")
+//
+//
+//        val tempDataArray = ArrayList<NearbyItemViewModel>()
+//
+//        for (i in 1..3){
+//            tempDataArray.add(NearbyItemViewModel("test", "test", i.toString()))
+//            Log.d("TEMP DATA ARRAY","!!!!!!")
+//        }
+//
+//        val nearAdapter = NearbyAdapter(tempDataArray)
+//        recyclerview?.adapter = nearAdapter
+//        recyclerview?.layoutManager = LinearLayoutManager(this)
+
 
 
     val locationPermissionRequest = registerForActivityResult(
@@ -97,7 +116,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val nearbyFragment = NearbyFragment()
 
         //Sets a default fragment
-        setFragmentMenu(settingsFragment)
+        setFragmentMenu(nearbyFragment)
 
         //Finds bottom nav value
         bottomNav = findViewById(R.id.bottomNav)
@@ -113,7 +132,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 //Sets and changes to history fragment
                 R.id.history->{
-                    setFragmentMenu(historyFragment)
+                    //setFragmentMenu(historyFragment)
                     if (savedInstanceState == null){
                         val histFrag = HistoryFragment()
                         val changeFrag: FragmentTransaction = supportFragmentManager.beginTransaction()
@@ -124,7 +143,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 //Sets and changes to nearby fragment
                 R.id.nearby->{
-                    setFragmentMenu(nearbyFragment)
+                    //setFragmentMenu(nearbyFragment)
                     if (savedInstanceState == null){
                         val nearFrag = NearbyFragment()
                         val changeFrag: FragmentTransaction = supportFragmentManager.beginTransaction()
@@ -135,7 +154,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 //Sets and changes to settings fragment
                 R.id.settings->{
-                    setFragmentMenu(settingsFragment)
+                    //setFragmentMenu(settingsFragment)
                     if (savedInstanceState == null){
                         val setFrag = SettingsFragment()
                         val changeFrag: FragmentTransaction = supportFragmentManager.beginTransaction()
@@ -213,7 +232,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                     }
                                 }
                                 val geoCacheLocations : MutableList<String?> = geoCacheSource.getGeoCaches(geoCaches)
-                                Log.d("geoCacheLocatios",geoCacheLocations.toString())
 
 //
                                 withContext(Dispatchers.Main){
@@ -227,8 +245,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                                 var longitude = location.split(delimeter)[1].toDouble()
                                                 val geoCacheMarker = LatLng(latitude, longitude)
                                                 val myLocation  = LatLng(currentLatitude,currentLongitude)
-                                                Log.d("Current location",myLocation.toString())
-                                                Log.d("Geocache Marker!!!!!",geoCacheMarker.toString())
+
 
                                                 mMap.addMarker(
                                                     MarkerOptions()

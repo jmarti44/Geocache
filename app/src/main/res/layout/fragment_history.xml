@@ -8,16 +8,84 @@
     tools:context=".MapsActivity">
 
     <TextView
-        android:id="@+id/historyFragment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="History Fragment"
-        android:textColor="#43a047"
-        android:textSize="40sp"
+        android:id="@+id/userText"
+        android:layout_width="113dp"
+        android:layout_height="36dp"
+        android:text="User: "
+        android:textColor="#000000"
+        android:textSize="24sp"
         android:textStyle="italic|bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.113"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.114" />
+
+    <TextView
+        android:id="@+id/numFound"
+        android:layout_width="114dp"
+        android:layout_height="37dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="52dp"
+        android:textColor="#000000"
+        android:text="Number of Geocaches Found:"
+        android:textStyle="italic|bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/userText" />
+
+    <TextView
+        android:id="@+id/diplayUserName"
+        android:layout_width="77dp"
+        android:layout_height="38dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="76dp"
+        android:text="TextView"
+        app:layout_constraintStart_toEndOf="@+id/userText"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/displayNumFound"
+        android:layout_width="80dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="TextView"
+        app:layout_constraintStart_toEndOf="@+id/numFound"
+        app:layout_constraintTop_toBottomOf="@+id/diplayUserName" />
+
+    <TextView
+        android:id="@+id/geoPoints"
+        android:layout_width="110dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="33dp"
+        android:layout_marginTop="14dp"
+        android:textColor="#000000"
+        android:text="GeoPoints:"
+        android:textStyle="italic|bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/numFound" />
+
+    <TextView
+        android:id="@+id/displayGeoPoints"
+        android:layout_width="80dp"
+        android:layout_height="33dp"
+        android:layout_marginStart="19dp"
+        android:layout_marginTop="18dp"
+        android:text="TextView"
+        app:layout_constraintStart_toEndOf="@+id/geoPoints"
+        app:layout_constraintTop_toBottomOf="@+id/displayNumFound" />
+
+    <TextView
+        android:id="@+id/userTitle"
+        android:layout_width="333dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="34dp"
+        android:layout_marginTop="17dp"
+        android:textColor="#000000"
+        android:textStyle="italic|bold"
+        android:text="Account Information"
+        android:textSize="34sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
