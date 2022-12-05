@@ -3,6 +3,7 @@ package com.example.myapplication
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.FragmentTransaction
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -15,7 +16,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.myapplication.Model.GeoCacheDataSource
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
 import com.example.myapplication.Util.*
 import com.example.myapplication.databinding.ActivityMapsBinding
 import com.google.android.gms.location.FusedLocationProviderClient
