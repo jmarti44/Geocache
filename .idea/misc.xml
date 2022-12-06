@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/geocache.xml" value="0.1185" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.3074074074074074" />
         <entry key="app/src/main/res/layout/activity_maps.xml" value="0.5418981342610939" />
         <entry key="app/src/main/res/layout/fragment_google_map.xml" value="0.1111111111111111" />

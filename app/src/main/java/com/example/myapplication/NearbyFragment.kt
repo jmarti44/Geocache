@@ -5,7 +5,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.fragment_nearby.view.*
+//import kotlinx.android.synthetic.main.fragment_nearby.view.*
 
 
 
