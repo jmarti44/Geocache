@@ -149,19 +149,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         val changeFrag: FragmentTransaction = supportFragmentManager.beginTransaction()
                         changeFrag.replace(R.id.map, nearFrag)
                         changeFrag.commit()
+//                        val nearIntent = Intent(this, NearbyActivity::class.java)
+//                        startActivity(nearIntent)
                     }
                 }
 
                 //Sets and changes to settings fragment
-                R.id.settings->{
-                    //setFragmentMenu(settingsFragment)
-                    if (savedInstanceState == null){
-                        val setFrag = SettingsFragment()
-                        val changeFrag: FragmentTransaction = supportFragmentManager.beginTransaction()
-                        changeFrag.replace(R.id.map, setFrag)
-                        changeFrag.commit()
-                    }
-                }
+//                R.id.settings->{
+//                    //setFragmentMenu(settingsFragment)
+//                    if (savedInstanceState == null){
+//                        val setFrag = SettingsFragment()
+//                        val changeFrag: FragmentTransaction = supportFragmentManager.beginTransaction()
+//                        changeFrag.replace(R.id.map, setFrag)
+//                        changeFrag.commit()
+//                    }
+//                }
             }
             true
         }

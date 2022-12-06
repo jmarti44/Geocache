@@ -29,13 +29,13 @@ class NearbyFragment:Fragment(R.layout.fragment_nearby) {
 
         for (i in 1..3){
             tempDataArray.add(NearbyItemViewModel("test", "test", i.toString()))
-            Log.d("TEMP DATA ARRAY","!!!!!!")
+//            Log.d("TEMP DATA ARRAY","!!!!!!")
         }
 
-        val nearAdapter = NearbyAdapter(tempDataArray)
+        val adapter = NearbyAdapter(tempDataArray)
         //nearbyAdapter.
-        recyclerview?.adapter = nearAdapter
-
+        recyclerview?.adapter = adapter
+        Log.d("NEARBY FRAGEMENT ON CREATE","!!!!!!")
 
     }
 }
