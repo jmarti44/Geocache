@@ -3,9 +3,11 @@ package com.example.myapplication
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.FragmentTransaction
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -13,27 +15,28 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.myapplication.Model.GeoCacheDataSource
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.example.myapplication.Model.GeoCacheDataSource
 import com.example.myapplication.Util.*
 import com.example.myapplication.databinding.ActivityMapsBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
     //google map objects
     private lateinit var mMap: GoogleMap
@@ -52,16 +55,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
     private  lateinit var geoCaches: List<String>
-    private lateinit var latlngObjects : MutableList<LatLng>
+    private  var  liveCacheData= MutableLiveData<MutableList<String>>().apply {
+        value  = mutableListOf()
+    }
+    private var geoMarkerMap : HashMap<String, Marker> = HashMap<String,Marker>()
 
-
-
-
-    //consumer key
-
-
-
-//    Path: /v1/geocaches
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -210,7 +208,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
             mMap = googleMap
             mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style))
-//            mMap.setMinZoomPreference(15f)
+
+        //enabling and drawing current lcation
             enableMyLocation()
             drawMyLocation()
             //getting currentLocation and getting geo cache codes
@@ -222,6 +221,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                             currentLatitude = location.latitude
                             currentLongitude = location.longitude
 
+                            //coroutine for making geocache api call
                             CoroutineScope(Dispatchers.IO).launch {
                                 geoCaches = geoCacheSource.getGeoCacheCodes(currentLongitude,currentLatitude)
                                 withContext(Dispatchers.Main){
@@ -233,29 +233,61 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                         toast("Ooops: Something else went wrong")
                                     }
                                 }
-                                val geoCacheLocations : MutableList<String?> = geoCacheSource.getGeoCaches(geoCaches)
+                                val geoCacheLocations : HashMap<String, String>? = geoCacheSource.getGeoCaches(geoCaches)
+                                var geoCacheNames : MutableList<String> = mutableListOf<String>()
 
-//
+
+
                                 withContext(Dispatchers.Main){
                                     try{
-                                        toast("Got ${geoCacheLocations.size} Geocache Points!")
-                                        var locationData: MutableList<List<String>> = arrayListOf()
-                                        for (location in geoCacheLocations){
+                                        toast("Got ${geoCacheLocations?.size} Geocache Points!")
+                                        for (name in geoCacheLocations?.keys!!){
                                             val delimeter = "|"
+                                            var location = geoCacheLocations.get(name)
+                                            var geoCacheName = name
+                                            geoCacheNames.add(geoCacheName)
+                                            
                                             if (location != null) {
                                                 var latitude = location.split(delimeter)[0].toDouble()
                                                 var longitude = location.split(delimeter)[1].toDouble()
                                                 val geoCacheMarker = LatLng(latitude, longitude)
-                                                val myLocation  = LatLng(currentLatitude,currentLongitude)
 
-
-                                                mMap.addMarker(
+                                                val currentMarker = mMap.addMarker(
                                                     MarkerOptions()
                                                         .position(geoCacheMarker)
-                                                        .title("Geo Cache Marker")
+                                                        .title(geoCacheName)
+                                                        .snippet("Collect Me")
+                                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_cache))
+
                                                 )
+                                                if (currentMarker != null) {
+                                                    geoMarkerMap.put(geoCacheName,currentMarker)
+                                                }
                                             }
                                         }
+                                        //changing marker colors based on fetched data from database
+                                        //checking database for previously collected caches
+
+
+                                        var userCaches: MutableSet<String>
+
+
+                                        getCaches()
+
+
+
+
+
+
+                                        //adding test marker!
+                                        var currentMarker = mMap.addMarker(
+                                            MarkerOptions()
+                                                .position(LatLng(currentLatitude,currentLongitude))
+                                                .title("My GeoCache")
+                                        )
+                                        setInfoWindow(mMap,currentMarker)
+
+
                                     }catch (e: HttpException) {
                                         toast("Exception ${e.message}")
                                     } catch (e: Throwable) {
@@ -274,9 +306,75 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     // Got last known location. In some rare situations this can be null.
                     }
 
-
             }
+
     }
+
+    private fun populateUserCaches(
+        cache: String,
+        geoCacheLocations: HashMap<String, String>,
+        cacheMap: HashMap<String, Marker>,
+        mMap: GoogleMap
+    ) {
+        //retreving marker object
+        Log.d("POPULATING USER CACHES!!!!","!!!!!!!")
+        var formerMarker: Marker? = cacheMap.get(cache)
+        if (formerMarker != null) {
+            formerMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_cache_found))
+            formerMarker.snippet = "FOUND"
+        }
+    }
+
+    private fun getCaches() {
+
+        val db = Firebase.firestore
+        Log.d("FUNCTION CALLED","!!!!!!!!!")
+
+        db.collection("caches")
+            .get()
+            .addOnSuccessListener { result ->
+                for (document in result) {
+                    Log.d("CACHE TITLE",document.data["title"].toString())
+                    liveCacheData.value?.add(document.data["title"].toString())
+
+                }
+
+                liveCacheData.observe(this@MapsActivity){userCaches->
+                    Log.d("OBSERVED DATA ","POPLUATED MARKERS WILL BE CALLED")
+
+                    if (userCaches.size!=0){
+
+                        Log.d("USER CACHE",userCaches.toString())
+
+
+                        for (cache in userCaches){
+                            var currentMarker : Marker? = geoMarkerMap.get(cache)
+                            Log.d("CURRENT MARKER", currentMarker?.title.toString())
+                            currentMarker?.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_cache_found))
+                            currentMarker?.snippet = "FOUND"
+                        }
+
+//                        for (userCache in userCaches){
+//                            if (userCache in geoCacheLocations.keys){
+////                                                        populateUserCaches(userCache,geoCacheLocations,geoMarkerMap,mMap)
+//                            }
+//                        }
+                    }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.w("CACHE", "Error getting documents.", exception)
+            }
+
+    }
+
+    private fun setInfoWindow(mMap: GoogleMap, currentMarker: Marker?) {
+        Log.d("SET ON INFO WINDOW LISTENER!!!!","!!!!!!!!!!")
+        mMap.setOnInfoWindowClickListener(this)
+
+    }
+
+
     fun drawMyLocation(){
         mMap.isMyLocationEnabled = true
 
@@ -323,42 +421,42 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             LOCATION_PERMISSION_REQUEST_CODE
         )
     }
-    fun populateObjects(geoCaches: List<String>) {
-        var locationData: MutableList<List<String>> = arrayListOf()
-
-        //getting locations of geocaches based on retreived geocachecodes
-        CoroutineScope(Dispatchers.IO).launch {
-            val geoCacheLocations : MutableList<String?> = geoCacheSource.getGeoCaches(geoCaches)
-            //cleaning location data (lat|long)
-            for (location in geoCacheLocations){
-                var delimeter = "|"
-                if (location != null) {
-                    locationData.add(location.split(delimeter))
-                }
-            }
-
-        }
-        if (locationData.size!=0){
-            Log.d("POPULATED LOCATION DATA BEING CALLED","!!!!!!!!")
-
-            for (latlng in locationData){
-                val latitude :Double? = latlng.get(0).toDouble()
-                val longitude :Double? = latlng.get(1).toDouble()
-
-
-//                val geoCacheMarker = LatLng(latitude!!, longitude!!)
-                Log.d("RETURNED GEOCACHE Latitude",latitude.toString())
-                Log.d("RETURNED GEOCACHE LONGITUDE",longitude.toString())
-
-                val geoCacheMarker = LatLng(latitude!!, longitude!!)
-                latlngObjects.add(geoCacheMarker)
-            }
-        }
-
-//        for (code in geoCaches){
-//            val geoCaches : List<String> = geoCacheSource.getGeoCaches(code)
+//    fun populateObjects(geoCaches: List<String>) {
+//        var locationData: MutableList<List<String>> = arrayListOf()
+//
+//        //getting locations of geocaches based on retreived geocachecodes
+//        CoroutineScope(Dispatchers.IO).launch {
+//            val geoCacheLocations : MutableList<String?> = geoCacheSource.getGeoCaches(geoCaches)
+//            //cleaning location data (lat|long)
+//            for (location in geoCacheLocations){
+//                var delimeter = "|"
+//                if (location != null) {
+//                    locationData.add(location.split(delimeter))
+//                }
+//            }
+//
 //        }
-    }
+//        if (locationData.size!=0){
+//            Log.d("POPULATED LOCATION DATA BEING CALLED","!!!!!!!!")
+//
+//            for (latlng in locationData){
+//                val latitude :Double? = latlng.get(0).toDouble()
+//                val longitude :Double? = latlng.get(1).toDouble()
+//
+//
+////                val geoCacheMarker = LatLng(latitude!!, longitude!!)
+//                Log.d("RETURNED GEOCACHE Latitude",latitude.toString())
+//                Log.d("RETURNED GEOCACHE LONGITUDE",longitude.toString())
+//
+//                val geoCacheMarker = LatLng(latitude!!, longitude!!)
+//                latlngObjects.add(geoCacheMarker)
+//            }
+//        }
+//
+////        for (code in geoCaches){
+////            val geoCaches : List<String> = geoCacheSource.getGeoCaches(code)
+////        }
+//    }
     companion object {
         /**
          * Request code for location permission request.
@@ -372,4 +470,63 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun toast(text:String){
         Toast.makeText(this,text, Toast.LENGTH_LONG).show()
     }
+
+    override fun onInfoWindowClick(marker: Marker) {
+
+
+        var cacheLocation: Location = Location(LocationManager.GPS_PROVIDER)
+        cacheLocation.longitude = marker.position.longitude
+        cacheLocation.latitude = marker.position.latitude
+
+
+
+        var myLocation : Location = Location(LocationManager.GPS_PROVIDER)
+        myLocation.latitude = currentLatitude
+        myLocation.longitude = currentLongitude
+
+        var distnaceInBetween: Float = myLocation.distanceTo(cacheLocation)
+
+        Log.d("DISTANCE_IN_BETWEEN",distnaceInBetween.toString())
+
+
+        if (distnaceInBetween <= 3){
+            marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_cache_found))
+            marker.snippet = "FOUND"
+
+            //attaching id to
+
+            var newCache = hashMapOf(
+                "title" to marker.title,
+                "latitude" to marker.position.latitude,
+                "longitude" to marker.position.longitude,
+            )
+        }
+        else{
+            toast("NOT IN RANGE OF THE CACHE")
+        }
+
+
+
+
+//        val db = Firebase.firestore
+//
+//
+//
+//        db.collection("caches")
+//            .add(newCache)
+//            .addOnSuccessListener { documentReference ->
+//                Log.d("Record added", "DocumentSnapshot added with ID: ${documentReference.id}")
+//            }
+//            .addOnFailureListener { e ->
+//                Log.w("Record Error", "Error adding document", e)
+//            }
+//        Toast.makeText(
+//            this, "Info window clicked",
+//            Toast.LENGTH_SHORT
+//        ).show()
+    }
 }
+
+//private fun GoogleMap.setOnInfoWindowClickListener(mapsActivity: MapsActivity) {
+//
+//}
