@@ -7,16 +7,18 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
+
 //import kotlinx.android.synthetic.main.fragment_nearby.view.*
 
 
 
 //This fragment shows nearby locations in
-class NearbyFragment:Fragment(R.layout.fragment_nearby) {
+class NearbyFragment(liveCacheData: MutableLiveData<MutableList<String>>) :Fragment(R.layout.fragment_nearby,) {
 
 
     lateinit var items: ArrayList<NearbyItemViewModel>
+
 
     //When app is created
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +32,7 @@ class NearbyFragment:Fragment(R.layout.fragment_nearby) {
         val recyclerview = view?.findViewById<RecyclerView>(R.id.recyclerview)
 
         //Create a list of numbers
-        items = NearbyItemViewModel.createList(20)
+        items = NearbyItemViewModel.createList()
 
         //Set Layout
         recyclerview?.layoutManager = LinearLayoutManager(this.context)

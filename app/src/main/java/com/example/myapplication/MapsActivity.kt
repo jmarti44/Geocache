@@ -16,7 +16,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.myapplication.Model.GeoCacheDataSource
 import com.example.myapplication.Util.*
@@ -54,7 +53,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
 
     private  lateinit var geoCaches: List<String>
-    private  var  liveCacheData= MutableLiveData<MutableList<String>>().apply {
+    var  liveCacheData= MutableLiveData<MutableList<String>>().apply {
         value  = mutableListOf()
     }
     private var geoMarkerMap : HashMap<String, Marker> = HashMap<String,Marker>()
@@ -66,24 +65,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
         setContentView(binding.root)
 
         geoCacheSource = GeoCacheDataSource(applicationContext)
-
-//        val recyclerview = findViewById<RecyclerView>(R.id.recyclerview)
-//
-//
-//        Log.d("NEARBY FRAGEMENT ON CREATE","!!!!!!")
-//
-//
-//        val tempDataArray = ArrayList<NearbyItemViewModel>()
-//
-//        for (i in 1..3){
-//            tempDataArray.add(NearbyItemViewModel("test", "test", i.toString()))
-//            Log.d("TEMP DATA ARRAY","!!!!!!")
-//        }
-//
-//        val nearAdapter = NearbyAdapter(tempDataArray)
-//        recyclerview?.adapter = nearAdapter
-//        recyclerview?.layoutManager = LinearLayoutManager(this)
-
 
 
     val locationPermissionRequest = registerForActivityResult(
@@ -135,7 +116,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
                 R.id.nearby->{
                     //setFragmentMenu(nearbyFragment)
                     if (savedInstanceState == null){
-                        val nearFrag = NearbyFragment()
+
+                        val nearFrag = NearbyFragment(liveCacheData)
                         val changeFrag: FragmentTransaction = supportFragmentManager.beginTransaction()
                         changeFrag.replace(R.id.map, nearFrag)
                         changeFrag.commit()
@@ -308,11 +290,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
         val db = Firebase.firestore
         Log.d("FUNCTION CALLED","!!!!!!!!!")
+        var tests :MutableList<HashMap<String, String>> = mutableListOf()
+
 
         db.collection("caches")
             .get()
             .addOnSuccessListener { result ->
                 for (document in result) {
+                    var newCache = hashMapOf(
+                        "title" to document.data["title"].toString(),
+                        "latitude" to document.data["latitude"].toString(),
+                        "longitude" to document.data["longitude"].toString()
+                    )
+                    NearbyItemViewModel.tests.add(newCache)
+
                     Log.d("CACHE TITLE",document.data["title"].toString())
                     liveCacheData.value?.add(document.data["title"].toString())
 
@@ -325,13 +316,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
                         Log.d("USER CACHE",userCaches.toString())
 
-
+                        val items = ArrayList<NearbyItemViewModel>()
                         for (cache in userCaches){
                             var currentMarker : Marker? = geoMarkerMap.get(cache)
                             Log.d("CURRENT MARKER", currentMarker?.title.toString())
                             currentMarker?.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_cache_found))
                             currentMarker?.snippet = "FOUND"
                         }
+
+
+
 
 //                        for (userCache in userCaches){
 //                            if (userCache in geoCacheLocations.keys){
@@ -452,6 +446,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
     override fun onInfoWindowClick(marker: Marker) {
 
+        val db = Firebase.firestore
 
         var cacheLocation: Location = Location(LocationManager.GPS_PROVIDER)
         cacheLocation.longitude = marker.position.longitude
@@ -468,21 +463,37 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
         Log.d("DISTANCE_IN_BETWEEN",distnaceInBetween.toString())
 
 
-        if (distnaceInBetween <= 3){
+//        if (distnaceInBetween <= 3){
             marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_cache_found))
             marker.snippet = "FOUND"
 
             //attaching id to
 
             var newCache = hashMapOf(
-                "title" to marker.title,
-                "latitude" to marker.position.latitude,
-                "longitude" to marker.position.longitude,
+                "title" to marker.title.toString(),
+                "latitude" to marker.position.latitude.toString(),
+                "longitude" to marker.position.longitude.toString(),
             )
-        }
-        else{
-            toast("NOT IN RANGE OF THE CACHE")
-        }
+
+            NearbyItemViewModel.tests.add(newCache)
+
+             db.collection("caches")
+                .add(newCache)
+                 .addOnSuccessListener { documentReference ->
+
+                   Log.d("Record added", "DocumentSnapshot added with ID: ${documentReference.id}")
+               }
+                .addOnFailureListener { e ->
+                    Log.w("Record Error", "Error adding document", e)
+                }
+        Toast.makeText(
+            this, "Info window clicked",
+            Toast.LENGTH_SHORT
+        ).show()
+        //}
+//        else{
+//            toast("NOT IN RANGE OF THE CACHE")
+//        }
 
 
 
