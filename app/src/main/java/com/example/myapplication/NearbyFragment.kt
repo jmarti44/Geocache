@@ -5,12 +5,7 @@ import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-<<<<<<< HEAD
-import androidx.appcompat.app.AppCompatActivity
-//import kotlinx.android.synthetic.main.fragment_nearby.view.*
 
-=======
->>>>>>> 231afaa7292d4644248ad234a2caa7eb5ddc55a7
 
 
 //This fragment shows nearby locations in

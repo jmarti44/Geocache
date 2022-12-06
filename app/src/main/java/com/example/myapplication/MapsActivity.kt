@@ -3,13 +3,14 @@ package com.example.myapplication
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.FragmentTransaction
+//import android.app.FragmentTransaction
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -464,9 +465,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
     }
 
+//    Toast.makeText(this,text, Toast.LENGTH_LONG).show()
 
     private fun toast(text:String){
         Toast.makeText(this,text, Toast.LENGTH_LONG).show()
+
+    }
+
+    fun customToast(message: String, imgSRC: Int){
+        val toast = Toast(this)
+        toast.apply {
+            val layout = relativeLayout.inflate(R.layout.custom_toast_message)
+            layout.textView.text = message
+            layout.imageView.setBackgroundResource(imgSRC)
+            setGravity(Gravity.CENTER,0,0)
+            duration = Toast.LENGTH_LONG
+            view = layout
+            show()
+        }
     }
 
     override fun onInfoWindowClick(marker: Marker) {
