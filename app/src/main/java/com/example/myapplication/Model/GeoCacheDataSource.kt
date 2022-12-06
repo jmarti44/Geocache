@@ -73,7 +73,6 @@ class GeoCacheDataSource(context:Context){
         val geoAPIKey = "uVUcXfEh6gHmQLnU96Gp"
         var center : String =latitude.toString() + "|" + longitude.toString()
 
-        Log.d("CENTER",center.toString())
 
 //        val response = geoCacheService.getGeoCacheTest("Archived",geoAPIKey)
         val response = geoCacheService.getGeoCacheCodes(center,geoAPIKey)
@@ -95,7 +94,6 @@ class GeoCacheDataSource(context:Context){
 
         //
         for (code in geoCacheCodes){
-            Log.d("current code",code)
             codes+=(code.toString() +"|")
         }
         codes = codes.substring(0,codes.length-1)

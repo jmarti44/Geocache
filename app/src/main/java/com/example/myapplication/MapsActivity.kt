@@ -3,6 +3,7 @@ package com.example.myapplication
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.FragmentTransaction
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -67,6 +68,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
         geoCacheSource = GeoCacheDataSource(applicationContext)
 
+//        val recyclerview = findViewById<RecyclerView>(R.id.recyclerview)
+//
+//
+//        Log.d("NEARBY FRAGEMENT ON CREATE","!!!!!!")
+//
+//
+//        val tempDataArray = ArrayList<NearbyItemViewModel>()
+//
+//        for (i in 1..3){
+//            tempDataArray.add(NearbyItemViewModel("test", "test", i.toString()))
+//            Log.d("TEMP DATA ARRAY","!!!!!!")
+//        }
+//
+//        val nearAdapter = NearbyAdapter(tempDataArray)
+//        recyclerview?.adapter = nearAdapter
+//        recyclerview?.layoutManager = LinearLayoutManager(this)
+
 
 
     val locationPermissionRequest = registerForActivityResult(
@@ -96,7 +114,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
         val nearbyFragment = NearbyFragment()
 
         //Sets a default fragment
-        setFragmentMenu(settingsFragment)
+        setFragmentMenu(nearbyFragment)
 
         //Finds bottom nav value
         bottomNav = findViewById(R.id.bottomNav)
@@ -112,7 +130,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
                 //Sets and changes to history fragment
                 R.id.history->{
-                    setFragmentMenu(historyFragment)
+                    //setFragmentMenu(historyFragment)
                     if (savedInstanceState == null){
                         val histFrag = HistoryFragment()
                         val changeFrag: FragmentTransaction = supportFragmentManager.beginTransaction()
@@ -123,7 +141,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
                 //Sets and changes to nearby fragment
                 R.id.nearby->{
-                    setFragmentMenu(nearbyFragment)
+                    //setFragmentMenu(nearbyFragment)
                     if (savedInstanceState == null){
                         val nearFrag = NearbyFragment()
                         val changeFrag: FragmentTransaction = supportFragmentManager.beginTransaction()
@@ -134,7 +152,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
                 //Sets and changes to settings fragment
                 R.id.settings->{
-                    setFragmentMenu(settingsFragment)
+                    //setFragmentMenu(settingsFragment)
                     if (savedInstanceState == null){
                         val setFrag = SettingsFragment()
                         val changeFrag: FragmentTransaction = supportFragmentManager.beginTransaction()
