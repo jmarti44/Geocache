@@ -10,6 +10,6 @@
         android:icon="@drawable/ic_person_foreground"/>
     <item
         android:id="@+id/nearby"
-        android:title="Nearby"
+        android:title="Stored Caches"
         android:icon="@drawable/ic_pin_foreground"/>
 </menu>
