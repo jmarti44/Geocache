@@ -109,13 +109,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this@MapsActivity)
 
-        //Creates fragment's to reference on bottom menu bar
-        val settingsFragment = SettingsFragment()
-        val historyFragment = HistoryFragment()
-        val nearbyFragment = NearbyFragment()
-
-        //Sets a default fragment
-        setFragmentMenu(nearbyFragment)
 
         //Finds bottom nav value
         bottomNav = findViewById(R.id.bottomNav)
@@ -147,17 +140,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
                         val nearFrag = NearbyFragment()
                         val changeFrag: FragmentTransaction = supportFragmentManager.beginTransaction()
                         changeFrag.replace(R.id.map, nearFrag)
-                        changeFrag.commit()
-                    }
-                }
-
-                //Sets and changes to settings fragment
-                R.id.settings->{
-                    //setFragmentMenu(settingsFragment)
-                    if (savedInstanceState == null){
-                        val setFrag = SettingsFragment()
-                        val changeFrag: FragmentTransaction = supportFragmentManager.beginTransaction()
-                        changeFrag.replace(R.id.map, setFrag)
                         changeFrag.commit()
                     }
                 }

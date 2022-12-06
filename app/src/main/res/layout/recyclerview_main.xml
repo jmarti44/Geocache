@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/locationTitle"
+        style="@style/TextAppearance.AppCompat.Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FF9800"
+        android:text="Tryiung" />
+
+    <TextView
+        android:id="@+id/locationDistance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Content" />
+
+    <TextView
+        android:id="@+id/locationFound"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Content" />
+
+</LinearLayout>

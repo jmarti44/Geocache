@@ -3,17 +3,13 @@
     <item
         android:id="@+id/map"
         android:title="Map"
-        android:icon="@drawable/ic_test_foreground"/>
+        android:icon="@drawable/ic_map_foreground"/>
     <item
         android:id="@+id/history"
         android:title="History"
-        android:icon="@drawable/ic_test_foreground"/>
+        android:icon="@drawable/ic_person_foreground"/>
     <item
         android:id="@+id/nearby"
-        android:title="Nearby"
-        android:icon="@drawable/ic_test_foreground"/>
-    <item
-        android:id="@+id/settings"
-        android:title="Settings"
-        android:icon="@drawable/ic_test_foreground"/>
+        android:title="Stored Caches"
+        android:icon="@drawable/ic_pin_foreground"/>
 </menu>
