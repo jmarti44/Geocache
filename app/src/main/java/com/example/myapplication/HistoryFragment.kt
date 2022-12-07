@@ -18,8 +18,7 @@ class HistoryFragment:Fragment(R.layout.fragment_history) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("HISTORY FRAGMENT!!!","FUCK THIS APP")
-//        editUserText =
+
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

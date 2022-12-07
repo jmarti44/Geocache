@@ -92,25 +92,19 @@ class GeoCacheDataSource(context:Context){
         val geoLocations : MutableList<String?> = arrayListOf()
         var codes =""
 
-        //
+
         for (code in geoCacheCodes){
             codes+=(code.toString() +"|")
         }
         codes = codes.substring(0,codes.length-1)
 
-
-
         val response = geoCacheService.getGeoCaches(codes,fields,geoAPIKey)
         val caches : Map<String, GeoCaches>? = response.body()
-        Log.d("RETREVIED RESPONSE", response.body().toString())
-//        response.body()?.javaClass?.let { Log.d("type", it.simpleName) }
         var hashMap : HashMap<String, String>
                 = HashMap<String, String> ()
         if (response.isSuccessful){
             for (code in geoCacheCodes)
             {
-
-
                 hashMap.put(caches?.get(code)?.name.toString(),
                     caches?.get(code)?.location.toString()
                 )
@@ -124,28 +118,8 @@ class GeoCacheDataSource(context:Context){
         else{
             return null
         }
-//        if (geoLocations.size !=0){
-//            return geoLocations
-//        }
-//        else{
-//            return arrayListOf()
-//        }
 
     }
-//    suspend fun getPlanetsInfo():List<GeoCacheCodes>{
-//        val response = geoCacheService.getGeoCaches()
-//        if(response.isSuccessful) {
-//            val planets = response.body()
-//
-//            if (planets != null) {
-//                return getAllGeoCaches(planets.count)
-//            }
-//        }
-//        return emptyList()
 
-
-
-    ///serialize to
-//    GeoCacheMap
 
 }

@@ -27,8 +27,6 @@ class LoginActivity : AppCompatActivity() {
 
 
         auth = Firebase.auth
-
-//
         emailTextView = findViewById(R.id.email)
         password = findViewById(R.id.password)
         signin = findViewById(R.id.signin)
@@ -46,7 +44,6 @@ class LoginActivity : AppCompatActivity() {
             signUpUser(email,passInput)
         }
     }
-
 
     fun signInUser(email:String,password:String){
         auth.signInWithEmailAndPassword(email, password)
