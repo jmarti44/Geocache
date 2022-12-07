@@ -9,19 +9,17 @@
         style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FF9800"
-        android:text="Tryiung" />
-
-    <TextView
-        android:id="@+id/locationDistance"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Content" />
+        android:background="#C589CF"
+        android:text="Tryiung"
+        android:textColor="#000000"
+        android:textStyle="bold|italic" />
 
     <TextView
         android:id="@+id/locationFound"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Content" />
+        android:layout_height="37dp"
+        android:text="Content"
+        android:textColor="#000000"
+        android:textStyle="bold|italic" />
 
 </LinearLayout>

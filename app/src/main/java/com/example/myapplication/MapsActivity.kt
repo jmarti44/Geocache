@@ -448,19 +448,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
     }
 
-    fun customToast(message: String, imgSRC: Int){
-        val toast = Toast(this)
-        toast.apply {
-            val layout = relativeLayout.inflate(R.layout.custom_toast_message)
-            layout.textView.text = message
-            layout.imageView.setBackgroundResource(imgSRC)
-            setGravity(Gravity.CENTER,0,0)
-            duration = Toast.LENGTH_LONG
-            view = layout
-            show()
-        }
-    }
-
     override fun onInfoWindowClick(marker: Marker) {
 
         val db = Firebase.firestore

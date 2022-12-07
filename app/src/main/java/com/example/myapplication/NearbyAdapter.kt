@@ -12,7 +12,7 @@ class NearbyAdapter (private val nearbyList: List<NearbyItemViewModel>) : Recycl
 
     class ViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
         val locationTitleText: TextView = itemView.findViewById(R.id.locationTitle)
-        val locationDistanceText: TextView = itemView.findViewById(R.id.locationDistance)
+        //val locationDistanceText: TextView = itemView.findViewById(R.id.locationDistance)
         val locationFoundText: TextView = itemView.findViewById(R.id.locationFound)
     }
 
@@ -26,7 +26,7 @@ class NearbyAdapter (private val nearbyList: List<NearbyItemViewModel>) : Recycl
         val nearbyItemViewModel = nearbyList[position]
 
         holder.locationTitleText.text = nearbyItemViewModel.locationTitle
-        holder.locationDistanceText.text = nearbyItemViewModel.locationDistance
+        //holder.locationDistanceText.text = nearbyItemViewModel.locationDistance
         holder.locationFoundText.text = nearbyItemViewModel.locationFound
     }
 
