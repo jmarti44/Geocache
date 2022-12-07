@@ -28,7 +28,7 @@
         android:layout_marginTop="30dp"
         android:fontFamily="sans-serif-light"
         android:hint="Password"
-        android:inputType="textAutoComplete"
+        android:inputType="textPassword"
         android:minHeight="@dimen/min_height"
         android:textSize="18sp"
         android:layout_below="@id/email"

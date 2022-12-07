@@ -197,14 +197,40 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
                                         //retreving user caches and updating markers
                                         getCaches()
+                                        //adding test markers!
+                                        //old main coordinates
+                                        var oldMainLatitude = 36.06872
+                                        var oldMainLongitude = -94.17188
 
-                                        //adding test marker!
-                                        var currentMarker = mMap.addMarker(
+                                        var unionLatitude = 36.06887
+                                        var unionLongitude = -94.17519
+
+
+                                        var firstMarker = mMap.addMarker(
                                             MarkerOptions()
-                                                .position(LatLng(currentLatitude,currentLongitude))
-                                                .title("My GeoCache")
+                                                .position(LatLng(oldMainLatitude,oldMainLongitude))
+                                                .title("Old main GeoCache")
+                                                .snippet("Collect Me")
+                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_cache))
                                         )
-                                        setInfoWindow(mMap,currentMarker)
+                                        var secondMarker = mMap.addMarker(
+                                            MarkerOptions  ()
+                                                .position(LatLng(unionLatitude,unionLongitude))
+                                                .title("Union GeoCache")
+                                                .snippet("Collect Me")
+                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_cache))
+                                        )
+                                        if (firstMarker != null) {
+                                            geoMarkerMap.put("My First GeoCache",firstMarker)
+                                        }
+                                        if (secondMarker != null) {
+                                            geoMarkerMap.put("My Second GeoCache",secondMarker)
+                                        }
+                                        setInfoWindow(mMap,firstMarker)
+                                        setInfoWindow(mMap,secondMarker)
+
+                                        geoCacheNames.add("Old main GeoCache")
+                                        geoCacheNames.add("Union GeoCache")
 
 
                                     }catch (e: HttpException) {
